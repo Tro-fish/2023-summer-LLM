@@ -5,10 +5,20 @@
 # DeepSpeed Team
 ACTOR_ZERO_STAGE="--actor_zero_stage 0"
 CRITIC_ZERO_STAGE="--critic_zero_stage 0"
-ACTOR_MODEL_PATH= "/content/drive/MyDrive/output/actor-models/125m/" # Provide the ckpt path of the actor model
-CRITIC_MODEL_PATH= "/content/drive/MyDrive/output/reward-models/125m/" # Provide the ckpt path of the critic model
+ACTOR_MODEL_PATH= $1 # Provide the ckpt path of the actor model
+CRITIC_MODEL_PATH= $2 # Provide the ckpt path of the critic model
 
 OUTPUT="./output"
+
+if [ "$OUTPUT" == "" ]; then
+    OUTPUT=./output
+fi
+if [ "$ACTOR_ZERO_STAGE" == "" ]; then
+    ACTOR_ZERO_STAGE=0
+fi
+if [ "$CRITIC_ZERO_STAGE" == "" ]; then
+    CRITIC_ZERO_STAGE=0
+fi
 
 Num_Padding_at_Beginning=1 # this is model related
 
@@ -37,9 +47,10 @@ deepspeed --num_gpus 1 main.py \
    --gradient_accumulation_steps 16 \
    --num_warmup_steps 100 \
    --deepspeed --seed 1234 \
+   --offload\
    --offload_reference_model \
    ${ACTOR_ZERO_STAGE} \
-   ${CRITIC_ZERO_STAGE} ${OFFLOAD}\
+   ${CRITIC_ZERO_STAGE} \
    --actor_lora_dim 128 \
    --actor_gradient_checkpointing \
    --critic_gradient_checkpointing \

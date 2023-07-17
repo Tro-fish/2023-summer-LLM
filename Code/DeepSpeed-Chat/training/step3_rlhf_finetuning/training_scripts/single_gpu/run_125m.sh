@@ -45,8 +45,7 @@ deepspeed --num_gpus 1 main.py \
    --gradient_accumulation_steps 16 \
    --num_warmup_steps 100 \
    --deepspeed --seed 1234 \
-   --offload\
-   --offload_reference_model \
+   --offload \
    ${ACTOR_ZERO_STAGE} \
    ${CRITIC_ZERO_STAGE} \
    --actor_lora_dim 128 \
@@ -55,4 +54,4 @@ deepspeed --num_gpus 1 main.py \
    --disable_actor_dropout \
    --enable_hybrid_engine \
    --output_dir $OUTPUT \
-    &> $OUTPUT/training.log
+    2>&1 | tee "$OUTPUT/training.log"

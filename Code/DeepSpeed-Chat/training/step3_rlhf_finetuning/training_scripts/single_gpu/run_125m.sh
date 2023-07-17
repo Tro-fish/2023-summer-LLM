@@ -30,8 +30,8 @@ mkdir -p $OUTPUT
 deepspeed --num_gpus 1 main.py \
    --data_path Dahoas/rm-static \
    --data_split 2,4,4 \
-   --actor_model_name_or_path $ACTOR_MODEL_PATH \
-   --critic_model_name_or_path $CRITIC_MODEL_PATH \
+   --actor_model_name_or_path ${ACTOR_MODEL_PATH} \
+   --critic_model_name_or_path ${CRITIC_MODEL_PATH} \
    --num_padding_at_beginning 1 \
    --per_device_train_batch_size 8 \
    --per_device_mini_train_batch_size 8 \

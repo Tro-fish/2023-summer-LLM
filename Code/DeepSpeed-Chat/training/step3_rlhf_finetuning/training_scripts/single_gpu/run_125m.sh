@@ -28,8 +28,8 @@ mkdir -p $OUTPUT
 deepspeed --num_gpus 1 main.py \
    --data_path Dahoas/rm-static \
    --data_split 2,4,4 \
-   --actor_model_name_or_path /content/drive/MyDrive/output/actor-models/125m\
-   --critic_model_name_or_path /content/drive/MyDrive/output/reward-models/125m\
+   --actor_model_name_or_path /content/drive/MyDrive/output/actor-models/125m \
+   --critic_model_name_or_path /content/drive/MyDrive/output/reward-models/125m \
    --num_padding_at_beginning 1 \
    --per_device_train_batch_size 8 \
    --per_device_mini_train_batch_size 8 \
@@ -37,7 +37,6 @@ deepspeed --num_gpus 1 main.py \
    --ppo_epochs 1 \
    --max_answer_seq_len 256 \
    --max_prompt_seq_len 256 \
-   --ppo_epochs 1 \
    --actor_learning_rate ${Actor_Lr} \
    --critic_learning_rate ${Critic_Lr} \
    --num_train_epochs 1 \
@@ -45,13 +44,11 @@ deepspeed --num_gpus 1 main.py \
    --gradient_accumulation_steps 16 \
    --num_warmup_steps 100 \
    --deepspeed --seed 1234 \
-   --offload \
    ${ACTOR_ZERO_STAGE} \
    ${CRITIC_ZERO_STAGE} \
    --actor_lora_dim 128 \
-   --actor_gradient_checkpointing \
-   --critic_gradient_checkpointing \
+   --critic_lora_dim 128 \
+   --only_optimize_lora \
    --disable_actor_dropout \
-   --enable_hybrid_engine \
    --output_dir $OUTPUT \
     2>&1 | tee "$OUTPUT/training.log"

@@ -66,8 +66,9 @@ class DeepSpeedPPOTrainer():
         self.gamma = 1.0
         self.lam = 0.95
 
+    # actor 모델을 통해서 response 생성
     def _generate_sequence(self, prompts, mask, step):
-
+       
         max_min_length = self.max_answer_seq_len + prompts.shape[1]
 
         with torch.no_grad():
@@ -105,6 +106,7 @@ class DeepSpeedPPOTrainer():
 
         return out_seq
 
+
     def generate_experience(self, prompts, mask, step):
         self.eval()
         seq = self._generate_sequence(prompts, mask, step)
@@ -115,10 +117,11 @@ class DeepSpeedPPOTrainer():
         with torch.no_grad():
             output = self.actor_model(seq, attention_mask=attention_mask)
             output_ref = self.ref_model(seq, attention_mask=attention_mask)
+
             reward_score = self.reward_model.forward_value(
                 seq, attention_mask,
-                prompt_length=self.prompt_length)['chosen_end_scores'].detach(
-                )
+                prompt_length=self.prompt_length)['chosen_end_scores'].detach()
+            
             values = self.critic_model.forward_value(
                 seq, attention_mask, return_value_only=True).detach()[:, :-1]
 
@@ -154,11 +157,11 @@ class DeepSpeedPPOTrainer():
     def train_rlhf(self, inputs):
         # train the rlhf mode here
         ### process the old outputs
-        prompts = inputs['prompts']
-        log_probs = inputs['logprobs']
-        ref_log_probs = inputs['ref_logprobs']
-        reward_score = inputs['rewards']
-        values = inputs['value']
+        prompts = inputs['prompts'] # 학습 prompt
+        log_probs = inputs['logprobs'] # Actor 모델의 확률 분포
+        ref_log_probs = inputs['ref_logprobs'] # Ref 모델의 확률 분포
+        reward_score = inputs['rewards'] # Reward 모델의 보상 값
+        values = inputs['value'] # Critic 모델의 보상 값
         attention_mask = inputs['attention_mask']
         seq = inputs['input_ids']
 
@@ -166,6 +169,7 @@ class DeepSpeedPPOTrainer():
         action_mask = attention_mask[:, 1:]
 
         old_values = values
+        
         with torch.no_grad():
             old_rewards = self.compute_rewards(prompts, log_probs,
                                                ref_log_probs, reward_score,

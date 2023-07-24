@@ -34,9 +34,9 @@ deepspeed --num_gpus 1 main.py \
    --per_device_train_batch_size 8 \
    --per_device_mini_train_batch_size 8 \
    --generation_batch_numbers 1 \
-   --release_inference_cache \ # 속도는 느리게 하고 메모리를 아끼는 옵션
+   --release_inference_cache \
    --ppo_epochs 1 \
-   --offload \
+   --offload_reference_model \
    --max_answer_seq_len 256 \
    --max_prompt_seq_len 256 \
    --actor_learning_rate ${Actor_Lr} \
@@ -45,12 +45,16 @@ deepspeed --num_gpus 1 main.py \
    --lr_scheduler_type cosine \
    --gradient_accumulation_steps 16 \
    --num_warmup_steps 100 \
+   --actor_gradient_checkpointing \
+   --critic_gradient_checkpointing \
    --deepspeed --seed 1234 \
    ${ACTOR_ZERO_STAGE} \
    ${CRITIC_ZERO_STAGE} \
    --actor_lora_dim 128 \
    --critic_lora_dim 128 \
-   --only_optimize_lora \
+   --print_answers \
    --disable_actor_dropout \
+   --enable_tensorboard \
+   --tensorboard_path /content/drive/MyDrive/output/tensorboard.log \
    --output_dir $OUTPUT \
     2>&1 | tee "$OUTPUT/training.log"

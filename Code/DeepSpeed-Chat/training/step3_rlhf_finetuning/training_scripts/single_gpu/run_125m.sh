@@ -34,7 +34,9 @@ deepspeed --num_gpus 1 main.py \
    --per_device_train_batch_size 8 \
    --per_device_mini_train_batch_size 8 \
    --generation_batch_numbers 1 \
+   --release_inference_cache \ # 속도는 느리게 하고 메모리를 아끼는 옵션
    --ppo_epochs 1 \
+   --offload \
    --max_answer_seq_len 256 \
    --max_prompt_seq_len 256 \
    --actor_learning_rate ${Actor_Lr} \

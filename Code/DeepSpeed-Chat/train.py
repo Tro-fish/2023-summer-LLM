@@ -57,14 +57,14 @@ def parse_args():
         "--actor-model",
         type=lambda x: x.replace("facebook/opt-", ""),
         default="1.3b",
-        choices=("125m","1.3b", "6.7b", "13b", "66b"),
+        choices=("1.3b", "6.7b", "13b", "66b"),
         help="Which facebook/opt-* model to use for Actor (step 1)",
     )
     parser.add_argument(
         "--reward-model",
         type=lambda x: x.replace("facebook/opt-", ""),
         default="350m",
-        choices=("125m","350m"),
+        choices=("350m"),
         help="Which facebook/opt-* model to use for Reward (step 2)",
     )
     parser.add_argument(
@@ -122,7 +122,7 @@ def get_output_dir(args, step_num):
     return output_dir
 
 
-def get_script(args, step_num): # 미리 설정된 script 실행하기
+def get_script(args, step_num):
     model_size = get_model_size(args, step_num)
     script = os.path.join(
         os.getcwd(),

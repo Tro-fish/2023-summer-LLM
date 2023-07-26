@@ -45,13 +45,12 @@ deepspeed --num_gpus 1 main.py \
    --lr_scheduler_type cosine \
    --gradient_accumulation_steps 16 \
    --num_warmup_steps 100 \
-   --actor_gradient_checkpointing \
-   --critic_gradient_checkpointing \
    --deepspeed --seed 1234 \
    ${ACTOR_ZERO_STAGE} \
    ${CRITIC_ZERO_STAGE} \
    --actor_lora_dim 128 \
    --critic_lora_dim 128 \
+   --only_optimize_lora \
    --print_answers \
    --disable_actor_dropout \
    --enable_tensorboard \

@@ -36,7 +36,6 @@ deepspeed --num_gpus 1 main.py \
    --generation_batch_numbers 1 \
    --release_inference_cache \
    --ppo_epochs 1 \
-   --offload_reference_model \
    --max_answer_seq_len 256 \
    --max_prompt_seq_len 256 \
    --actor_learning_rate ${Actor_Lr} \
@@ -50,9 +49,12 @@ deepspeed --num_gpus 1 main.py \
    ${CRITIC_ZERO_STAGE} \
    --actor_lora_dim 128 \
    --critic_lora_dim 128 \
-   --only_optimize_lora \
    --print_answers \
    --disable_actor_dropout \
+   --enable_hybrid_engine \
+   --actor_gradient_checkpointing \
+   --critic_gradient_checkpointing \
+   --offload_reference_model \
    --enable_tensorboard \
    --tensorboard_path /content/drive/MyDrive/output/tensorboard.log \
    --output_dir $OUTPUT \

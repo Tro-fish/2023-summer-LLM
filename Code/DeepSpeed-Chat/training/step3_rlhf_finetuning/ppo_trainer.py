@@ -8,6 +8,7 @@ import sys
 import os
 import deepspeed
 from deepspeed.runtime.zero.partition_parameters import ZeroParamStatus
+from utils.prompter import Prompter
 
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
@@ -70,7 +71,6 @@ class DeepSpeedPPOTrainer():
     def _generate_sequence(self, prompts, mask, step):
        
         max_min_length = self.max_answer_seq_len + prompts.shape[1]
-
         with torch.no_grad():
             seq = self.actor_model.module.generate(
                 prompts,
@@ -171,15 +171,13 @@ class DeepSpeedPPOTrainer():
         old_values = values
         
         with torch.no_grad():
-            old_rewards = self.compute_rewards(prompts, log_probs,
-                                               ref_log_probs, reward_score,
-                                               action_mask)
+            old_rewards = self.compute_rewards(prompts, log_probs,ref_log_probs, reward_score, action_mask) 
             ends = start + action_mask[:, start:].sum(1) + 1
             # we need to zero out the reward and value after the end of the conversation
             # otherwise the advantage/return will be wrong
             for i in range(old_rewards.shape[0]):
-                old_rewards[i, ends[i]:] = 0
-                old_values[i, ends[i]:] = 0
+                old_rewards[i, ends[i]:] = 0 # 이전 step에서 생성된 보상 값.
+                old_values[i, ends[i]:] = 0 # 이전 step에서 생성된 가치 값.
             advantages, returns = self.get_advantages_and_returns(
                 old_values, old_rewards, start)
 
@@ -198,6 +196,7 @@ class DeepSpeedPPOTrainer():
         value = self.critic_model.forward_value(**batch,
                                                 return_value_only=True,
                                                 use_cache=False)[:, :-1]
+        
         critic_loss = self.critic_loss_fn(value[:, start:], old_values[:,
                                                                        start:],
                                           returns, action_mask[:, start:])

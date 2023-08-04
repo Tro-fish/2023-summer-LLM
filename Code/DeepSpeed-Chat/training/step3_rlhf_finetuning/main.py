@@ -22,7 +22,14 @@ import random
 import torch
 from torch.utils.data import DataLoader, RandomSampler
 from torch.utils.data.distributed import DistributedSampler
-
+from peft import (
+    LoraConfig,
+    get_peft_model,
+    get_peft_model_state_dict,
+    prepare_model_for_int8_training,
+    set_peft_model_state_dict,
+)
+from transformers import GPTNeoXForCausalLM, GPTNeoXTokenizerFast
 from torch.utils.tensorboard import SummaryWriter
 
 from transformers import (
@@ -405,11 +412,13 @@ def main():
     torch.distributed.barrier()
 
     # create common tokenizer based on actor model
-    tokenizer = load_hf_tokenizer(args.actor_model_name_or_path,
-                                  fast_tokenizer=True)
-    tokenizer.pad_token = tokenizer.eos_token
+    ################ 수정됨 ################
+    tokenizer = GPTNeoXTokenizerFast.from_pretrained("EleutherAI/polyglot-ko-12.8b")
+    tokenizer.pad_token = 0
     # make sure tokenizer is right pad in our logic
-    tokenizer.padding_side = 'right'
+    tokenizer.padding_side = 'left'
+    ################ 수정됨 ################
+
     prompt_train_dataloader, unsupervised_train_dataloader, num_total_iters = create_datasets(
         args=args, tokenizer=tokenizer, train_phase=3)
 
